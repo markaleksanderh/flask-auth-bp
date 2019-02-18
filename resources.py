@@ -5,12 +5,13 @@ parser = reqparse.RequestParser()
 parser.add_argument('username', help='This field cannot be blank', required=True)
 parser.add_argument('password', help='This field cannot be blank', required=True)
 
-
 class UserRegistration(Resource):
     def post(self):
         data = parser.parse_args()
+        if UserModel.find_by_username(data['username']):
+            return {'message': '{} already exits'.format(data['username'])}
         new_user = UserModel(
-            username=data['username']
+            username=data['username'],
             password=data['password']
         )
         try:
