@@ -12,7 +12,7 @@ class UserRegistration(Resource):
             return {'message': '{} already exits'.format(data['username'])}
         new_user = UserModel(
             username=data['username'],
-            password=data['password']
+            password=UserModel.generate_hash(data['password'])
         )
         try:
             new_user.save_to_db()
@@ -26,10 +26,14 @@ class UserLogin(Resource):
         current_user = UserModel.find_by_username(data['username'])
         if not current_user:
             return {'message': '{} does not exist'.format(data['username'])}
-        if data['password'] == current_user.password:
+        if UserModel.verify_hash(data['password'], current_user.password):
             return {'message': 'Logged in as {}'.format(current_user.username)}
         else:
             return {'message': 'Incorrect credentials'}
+        # if data['password'] == current_user.password:
+        #     return {'message': 'Logged in as {}'.format(current_user.username)}
+        # else:
+        #     return {'message': 'Incorrect credentials'}
 
 class UserLogoutAccess(Resource):
     def post(self):
